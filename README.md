@@ -11,7 +11,7 @@ I am learning Ansible using the AU294 material for Ansible Automation Platform 2
 
 ## My lab
 
-I use VMware Fusion on a Mac mini.
+I use VMware Fusion on a Mac mini M4.
 
 The lab has five RHEL 10 ARM virtual machines:
 
