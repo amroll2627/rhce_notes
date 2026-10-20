@@ -10,7 +10,7 @@ I also saved baseline snapshots so I can return to a working setup without reins
 
 ## 2. Platform and storage
 
-I use VMware Fusion on a Mac mini with Apple silicon.
+I use VMware Fusion on a Mac mini with Apple silicon M4.
 
 The virtual machines use RHEL 10.0 for ARM. The installer is:
 
