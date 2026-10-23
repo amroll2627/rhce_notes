@@ -2,7 +2,7 @@
 
 [Back to index](README.md)
 
-Status: Completed my adapted Chapter 2 home lab exercises.
+Status: Completed my adapted Chapter 2 home lab exercises. This recap written mostly using ChatGPT based on the lab that I've done.
 
 I used the AU294 material for AAP 2.5 and practised on my RHEL 10 ARM lab. My basic configuration is already in [Chapter 1](01_chapter_one.md).
 
