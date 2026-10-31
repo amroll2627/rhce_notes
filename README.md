@@ -2,7 +2,9 @@
 
 This is where I keep my RHCE study notes and home lab setup.
 
-I am learning Ansible using the AU294 material for Ansible Automation Platform 2.5. I write these notes in my own words so I can refer to them when I forget something.
+I am learning Ansible using the AU294 material for Ansible Automation Platform 2.5. These notes help me refer back to the topics and exercises when I forget something.
+
+I use ChatGPT to help explain topics, review my attempts and draft these notes. The lab exercises and recorded results are from my own practice.
 
 ## My notes
 
