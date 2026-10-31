@@ -6,7 +6,7 @@ Status: Completed my adapted Chapter 2 home lab exercises. This is sort of recap
 
 I used the AU294 material for AAP 2.5 and practised on my RHEL 10 ARM lab. My basic configuration is already in [Chapter 1](01_chapter_one.md).
 
-These notes follow what I actually tried. I cleaned up some task names and formatting in the examples. Blocks marked **Observed** are shortened results from my lab. **Reference** commands are reminders, not a claim that I tested every option.
+These notes follow what I actually tried. Some task names and formatting have been cleaned up in the examples. Blocks marked **Observed** are shortened results from my lab. **Reference** commands are reminders, not a claim that I tested every option.
 
 ## 1. What I worked on
 
@@ -735,7 +735,7 @@ I can now write and troubleshoot these small playbooks in my home lab. I still n
 
 My reading references:
 
-1. AU294 AAP 2.5, Chapter 2. I used my course material and wrote these notes in my own words.
+1. AU294 AAP 2.5, Chapter 2. The course material was the reference for my adapted home lab exercises.
 2. [Ansible inventory guide](https://docs.ansible.com/projects/ansible/latest/inventory_guide/intro_inventory.html).
 3. [Ansible URI module](https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/uri_module.html).
 4. [Ansible Navigator settings](https://docs.ansible.com/projects/navigator/settings/).
