@@ -8,9 +8,9 @@ I used AU294 for AAP 2.5 on my RHEL 10 ARM lab. My setup is already in [the lab 
 
 This chapter took me a few sessions. I sometimes referred to my earlier playbooks when I forgot a parameter. I still need practice writing these from requirements without looking back.
 
-These notes follow my actual exercises. I cleaned up task names and made a few settings explicit in the examples. **Observed** means a result from my lab. **Reference** means a reminder or corrected example, not a claim that I ran every command shown. I did not run the Red Hat classroom grader. Password values and encrypted secret data are not included here.
+These notes follow my actual exercises. Task names have been cleaned up and a few settings made explicit in the examples. **Observed** means a result from my lab. **Reference** means a reminder or corrected example, not a claim that I ran every command shown. I did not run the Red Hat classroom grader. Password values and encrypted secret data are not included here.
 
-For this public version, I replaced my homelab IP addresses with documentation-only addresses from 192.0.2.0/24 in both examples and displayed results. These are placeholders, not the addresses to use when running the commands. I need to substitute my own inventory values. The task counts, HTTP statuses and other reported results are unchanged.
+The addresses below are the actual private IP addresses used in my RHCE home lab, so the examples and results match my inventory.
 
 ## 1. What I worked on
 
@@ -29,12 +29,12 @@ My `inventory-bab3` grouped the four managed hosts like this:
 
 ```ini
 [prod]
-servera ansible_host=192.0.2.10
-serverb ansible_host=192.0.2.11
+servera ansible_host=172.16.218.10
+serverb ansible_host=172.16.218.11
 
 [dev]
-serverc ansible_host=192.0.2.12
-serverd ansible_host=192.0.2.13
+serverc ansible_host=172.16.218.12
+serverd ansible_host=172.16.218.13
 
 [allservers:children]
 prod
@@ -299,10 +299,10 @@ Inventory name: servera
 Hostname: servera
 OS: RedHat 10.0
 Architecture: aarch64
-IPv4: 192.0.2.10
+IPv4: 172.16.218.10
 ```
 
-I first used the list of IPv4 addresses, which printed `['192.0.2.10']`. To get the address associated with the default IPv4 interface, I needed the address key inside the default_ipv4 dictionary.
+I first used the list of IPv4 addresses, which printed `['172.16.218.10']`. To get the address associated with the default IPv4 interface, I needed the address key inside the default_ipv4 dictionary.
 
 ```text
 ansible_facts -> default_ipv4 -> address
@@ -376,7 +376,7 @@ I used these expressions in `facts-inventory.yml`:
 | hostvars['serverb']['ansible_facts']['default_ipv4']['address'] | Serverb's gathered default IPv4 address |
 | playbook_dir | The playbook directory on the controller side |
 
-**Observed:** Servera and serverb showed allservers and prod. Serverc and serverd showed allservers and dev. Every host displayed serverb's IP as 192.0.2.11 when I used hostvars.
+**Observed:** Servera and serverb showed allservers and prod. Serverc and serverd showed allservers and dev. Every host displayed serverb's IP as 172.16.218.11 when I used hostvars.
 
 My play gathered facts for allservers before running the debug task. Looking up another host in hostvars does not gather its facts automatically. Those facts must already be available from gathering or an appropriate fact cache.
 
@@ -712,7 +712,7 @@ My final `webserver-review.yml`, with task names cleaned up and the expected HTT
   tasks:
     - name: Request the page using basic authentication
       ansible.builtin.uri:
-        url: https://192.0.2.11/
+        url: https://172.16.218.11/
         user: "{{ web_user }}"
         password: "{{ web_pass }}"
         force_basic_auth: true
@@ -731,7 +731,7 @@ This playbook depends on the prepared local configuration and encrypted variable
 
 I used an IP in the URL because Ansible inventory aliases do not automatically become DNS names available to servera. The FQDN in the page comes from serverb's facts.
 
-The URI module accepts user and password as aliases for url_username and url_password. Its default successful status is already 200. I wrote status_code explicitly in this notes version to make the test clearer. Certificate validation is disabled for this controlled lab's self-signed certificate.
+The URI module accepts user and password as aliases for url_username and url_password. Its default successful status is already 200. The notes version includes status_code explicitly to make the test clearer. Certificate validation is disabled for this controlled lab's self-signed certificate.
 
 I first debugged the entire auth_test result. I changed it to auth_test.content so the task displays the page requested by the exercise. The no_log setting on the URI task does not carry over to another debug task.
 
@@ -746,7 +746,7 @@ ansible-navigator run webserver-review.yml -i inventory-bab3 -m stdout --pae fal
 **Observed returned content:**
 
 ```text
-serverb.lab.example.com (192.0.2.11) has been customized by Ansible.
+serverb.lab.example.com (172.16.218.11) has been customized by Ansible.
 ```
 
 **Observed repeated-run recap:**
@@ -761,7 +761,7 @@ There were nine setup tasks plus fact gathering on serverb. Servera had fact gat
 I also tested the same URL from servera without sending login credentials:
 
 ```bash
-ssh student@192.0.2.10 'curl -ks -o /dev/null -w "%{http_code}\n" https://192.0.2.11/'
+ssh student@172.16.218.10 'curl -ks -o /dev/null -w "%{http_code}\n" https://172.16.218.11/'
 ```
 
 **Observed:**
@@ -795,7 +795,7 @@ I finished the adapted chapter, but I do not yet remeber every option without ch
 
 My reading references:
 
-1. AU294 AAP 2.5, Chapter 3, including the final review and summary. These notes use my own explanations and homelab results.
+1. AU294 AAP 2.5, Chapter 3, including the final review and summary. These notes record the exercises, corrections and results from my homelab.
 2. [Ansible variables](https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_variables.html).
 3. [Facts and magic variables](https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_vars_facts.html).
 4. [Encrypting content with Ansible Vault](https://docs.ansible.com/projects/ansible/latest/vault_guide/vault_encrypting_content.html).
