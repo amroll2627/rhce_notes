@@ -1,21 +1,21 @@
 # My RHCE Notes
 
-This is where I keep my RHCE study notes and home lab setup.
+RHCE study notes, home lab setup and things to revisit during revision.
 
-I am learning Ansible using the AU294 material for Ansible Automation Platform 2.5. These notes help me refer back to the topics and exercises when I forget something.
+I am learning Ansible using the AU294 material for Ansible Automation Platform 2.5. These notes collect the topics, exercises and useful reminders in one place.
 
 I use ChatGPT to help explain topics, review my attempts and draft these notes. The lab exercises and recorded results are from my own practice.
 
-## My notes
+## Notes
 
 1. [Home lab setup](00_lab_setup.md)
 2. [Chapter 1: Introducing Ansible](01_chapter_one.md)
 3. [Chapter 2: Introduction to Developing Automation Content](02_chapter_two.md)
 4. [Chapter 3: Developing Automation Content: Variables](03_chapter_three.md)
 
-## My lab
+## Lab
 
-I use VMware Fusion on a Mac mini M4.
+The lab runs on VMware Fusion on a Mac mini M4.
 
 The lab has five RHEL 10 ARM virtual machines:
 
@@ -25,18 +25,18 @@ The lab has five RHEL 10 ARM virtual machines:
 4. serverc
 5. serverd
 
-I use VS Code, Podman and Ansible Navigator on workstation.
+VS Code, Podman and Ansible Navigator run on workstation.
 
-## My learning progress
+## Learning progress
 
 The basic lab setup is working. Ansible can connect to all four managed servers and run tasks through sudo.
 
-I have saved baseline snapshots before starting the exercises.
+Baseline snapshots were saved before starting the exercises.
 
 Some settings were copied during the first setup. I still need to understand them and practise writing them myself.
 
-I have completed my Chapter 2 home lab exercises. My notes cover inventories, playbooks, services, firewall rules and troubleshooting, including the final MariaDB and PHP web server review.
+Chapter 2 home lab exercises are complete. The notes cover inventories, playbooks, services, firewall rules and troubleshooting, including the final MariaDB and PHP web server review.
 
-I have completed my Chapter 3 home lab exercises covering variables, facts, magic variables and Ansible Vault. My final HTTPS review returned the correct page with authentication, rejected access without login, and completed a repeated run with no changes. I still need practice recalling the options without checking earlier examples.
+Chapter 3 home lab exercises are complete. The notes cover variables, facts, magic variables and Ansible Vault. The final HTTPS review returned the correct page with authentication, rejected access without login, and completed a repeated run with no changes. I still need practice recalling the options without checking earlier examples.
 
-These are my personal learning notes, not official Red Hat documentation.
+These are personal learning notes, not official Red Hat documentation.

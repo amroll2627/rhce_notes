@@ -2,17 +2,17 @@
 
 [Back to index](README.md)
 
-Status: Completed my adapted Chapter 3 home lab exercises, including the final HTTPS authentication review in section 3.7. Section 3.8 is the chapter summary.
+Status: Adapted Chapter 3 home lab exercises completed, including the final HTTPS authentication review in section 3.7. Section 3.8 is the chapter summary.
 
-I used AU294 for AAP 2.5 on my RHEL 10 ARM lab. My setup is already in [the lab notes](00_lab_setup.md), and the earlier playbook basics are in [Chapter 2](02_chapter_two.md).
+These exercises use AU294 for AAP 2.5 on a RHEL 10 ARM lab. The setup is covered in [the lab notes](00_lab_setup.md), and the earlier playbook basics are in [Chapter 2](02_chapter_two.md).
 
 This chapter took me a few sessions. I sometimes referred to my earlier playbooks when I forgot a parameter. I still need practice writing these from requirements without looking back.
 
-These notes follow my actual exercises. Task names have been cleaned up and a few settings made explicit in the examples. **Observed** means a result from my lab. **Reference** means a reminder or corrected example, not a claim that I ran every command shown. I did not run the Red Hat classroom grader. Password values and encrypted secret data are not included here.
+These notes follow the completed lab exercises. Task names have been cleaned up and a few settings made explicit in the examples. **Observed** means a recorded lab result. **Reference** means a reminder or corrected example; not every command shown was tested. The Red Hat classroom grader was not run. Password values and encrypted secret data are not included here.
 
-The addresses below are the actual private IP addresses used in my RHCE home lab, so the examples and results match my inventory.
+The addresses below are the actual private IP addresses used in this RHCE home lab, so the examples and results match the inventory.
 
-## 1. What I worked on
+## 1. Topics covered
 
 1. Define variables inside a play and reuse them in tasks.
 2. Move values into group_vars, host_vars and separate variable files.
@@ -23,9 +23,9 @@ The addresses below are the actual private IP addresses used in my RHCE home lab
 7. Encrypt files and individual variables with Ansible Vault.
 8. Configure an HTTPS server and test authentication using an encrypted password.
 
-## 2. My Chapter 3 inventory
+## 2. Chapter 3 inventory
 
-My `inventory-bab3` grouped the four managed hosts like this:
+The `inventory-bab3` file grouped the four managed hosts like this:
 
 ```ini
 [prod]
@@ -44,13 +44,13 @@ dev
 serverb
 ```
 
-I added `webserver` for the final review. Serverb still belongs to prod and allservers. Its existing address applies when it is selected through webserver too.
+The `webserver` group was added for the final review. Serverb still belongs to prod and allservers. Its existing address applies when it is selected through webserver too.
 
-I used `-i inventory-bab3` for this chapter. When I forgot it in an ad hoc command, Ansible used a different inventory and reported that no hosts matched servera. The inventory option from an earlier command is not remembered by the next command.
+Commands for this chapter used `-i inventory-bab3`. When I forgot it in an ad hoc command, Ansible used a different inventory and reported that no hosts matched servera. The inventory option from an earlier command is not remembered by the next command.
 
 ## 3. Variables inside a play
 
-My first exercise installed Cockpit and firewalld on allservers. I defined these play variables:
+The first exercise installed Cockpit and firewalld on allservers using these play variables:
 
 ```yaml
 vars:
@@ -61,7 +61,7 @@ vars:
   firewall_rule: cockpit
 ```
 
-I referenced them in tasks instead of repeating the values:
+Tasks reference these variables instead of repeating the values:
 
 ```yaml
 - name: Install server and firewall packages
@@ -78,9 +78,9 @@ I referenced them in tasks instead of repeating the values:
     enabled: true
 ```
 
-These are task fragments for a play's task list. I also started firewalld and enabled its cockpit service with both `permanent: true` and `immediate: true`.
+These are task fragments for a play's task list. The complete exercise also started firewalld and enabled its cockpit service with both `permanent: true` and `immediate: true`.
 
-I use `{{ variable_name }}` when inserting a value into a module parameter. When the whole YAML value starts with a Jinja expression, I quote it as shown above.
+Use `{{ variable_name }}` to insert a value into a module parameter. Quote the whole YAML value when it starts with a Jinja expression, as shown above.
 
 `vars` is a dictionary of names and values. `tasks` is a list of task dictionaries. I first forgot the list item under tasks in my user creation plays. This is the corrected shape:
 
@@ -104,7 +104,7 @@ The development play used bob with UID 9999. I initially targeted prod by mistak
 
 ## 4. Moving values into group_vars
 
-I moved the shared service variables into `group_vars/allservers.yml`. The user settings became:
+The shared service variables were moved into `group_vars/allservers.yml`. The user settings became:
 
 `group_vars/prod.yml`:
 
@@ -122,9 +122,9 @@ usr: bob
 uid: 9999
 ```
 
-The file names match inventory group names. In my project, group_vars is beside the playbook and inventory.
+The file names match inventory group names. In this project, group_vars is beside the playbook and inventory.
 
-I could then replace the two user plays with one:
+With those values defined, we can replace the two user plays with one:
 
 ```yaml
 - name: Create the user selected by each host's group
@@ -144,13 +144,13 @@ Even though the play targets allservers, variables are resolved for each host.
 | servera, serverb | prod | alice, UID 8888 |
 | serverc, serverd | dev | bob, UID 9999 |
 
-**Observed:** My combined service and user playbook completed with `ok=7 changed=0 failed=0` on each host.
+**Observed:** The combined service and user playbook completed with `ok=7 changed=0 failed=0` on each host.
 
 One small formatting issue: `cat group_vars/*` joined the end of one file onto the start of the next because I had not saved a final newline. I now keep a newline at the end of each file.
 
-## 5. Variable precedence I tested
+## 5. Variable precedence
 
-I used `lab_message` to compare several places where a value can be defined.
+The precedence exercise used `lab_message` to compare several places where a value can be defined.
 
 | Test | Result |
 | --- | --- |
@@ -164,15 +164,15 @@ ansible-navigator run variables-precedence.yml -i inventory-bab3 -m stdout
 ansible-navigator run variables-precedence.yml -i inventory-bab3 -m stdout -e lab_message=from_cli
 ```
 
-For these sources, the order I observed from lower to higher priority was:
+For these sources, the observed order from lower to higher priority was:
 
 ```text
 group_vars < host_vars < play vars < extra vars (-e)
 ```
 
-This is the comparison I practised, not the complete precedence list. I should not assume that a host variable overrides a play variable just because a host sounds more specific.
+This covers the sources compared in the exercise, not the complete precedence list. A host variable does not override a play variable just because a host sounds more specific.
 
-Extra vars override other variable definitions for that run. They do not rewrite my YAML files.
+Extra vars override other variable definitions for that run. They do not rewrite the YAML files.
 
 I also got a deprecation warning when I wrote vars as a list of dictionaries. The corrected form was:
 
@@ -183,7 +183,7 @@ vars:
 
 ## 6. Variable files, dictionaries and lists
 
-My `vars/lab.yml` contained:
+The `vars/lab.yml` file contained:
 
 ```yaml
 ---
@@ -196,9 +196,9 @@ topics:
 report_path: /tmp/rhce-bab3-report.txt
 ```
 
-I loaded it with `vars_files: vars/lab.yml`. A single filename is valid here. A YAML list of filenames can also be used.
+Load the file with `vars_files: vars/lab.yml`. A single filename is valid here. A YAML list of filenames can also be used.
 
-My `variables-report.yml`:
+The `variables-report.yml` playbook:
 
 ```yaml
 ---
@@ -223,7 +223,7 @@ My `variables-report.yml`:
         var: report_result
 ```
 
-`lab` is a dictionary, so I select keys such as `lab['course']`. `topics` is a list, so I select positions starting at zero.
+`lab` is a dictionary, so values are selected by keys such as `lab['course']`. `topics` is a list, with positions starting at zero.
 
 I first wrote `topics[0],[1]`, which did not select two items from topics as I intended. I corrected it to two separate expressions. I also removed quotes from inside the `content: |` block because those quotes were being written into the file.
 
@@ -252,34 +252,34 @@ mode: 0644
 size: 67
 ```
 
-The copy result did not contain a content field. Later, the uri module did return `auth_test.content` because I requested `return_content: true`.
+The copy result did not contain a content field. Later, the uri module did return `auth_test.content` with `return_content: true` enabled.
 
-| Result | What I can use it for |
+| Result | Use |
 | --- | --- |
 | report_result.changed | Whether the copy task reported a change |
 | report_result.dest | The returned destination path |
-| auth_test.content | The response body returned by my URI request |
+| auth_test.content | The response body returned by the URI request |
 | auth_test.status | The HTTP response status returned by URI |
 
-The available fields depend on the module and the result. I inspect the result or the module's Return Values documentation before guessing a field name.
+The available fields depend on the module and the result. Check the result or the module's Return Values documentation before choosing a field name.
 
-With `debug.var`, I provide the variable expression directly:
+With `debug.var`, provide the variable expression directly:
 
 ```yaml
 ansible.builtin.debug:
   var: report_result.changed
 ```
 
-With `debug.msg`, I use Jinja when inserting a value into a message:
+With `debug.msg`, use Jinja to insert a value into a message:
 
 ```yaml
 ansible.builtin.debug:
   msg: "Report changed: {{ report_result.changed }}"
 ```
 
-## 8. Facts in my host report
+## 8. Facts in the host report
 
-I extended the report with information collected from each server:
+The report was extended with information collected from each server:
 
 ```yaml
 content: |
@@ -310,7 +310,7 @@ ansible_facts -> default_ipv4 -> address
 
 That path is a nested dictionary lookup. It is different from selecting `topics[0]` from a list. The default IPv4 fact depends on the host having the relevant network information available.
 
-Automatic fact gathering runs at the start of a play unless disabled. I can inspect the collected data with:
+Automatic fact gathering runs at the start of a play unless disabled. Use this task to inspect the collected data:
 
 ```yaml
 - name: Inspect collected facts
@@ -318,11 +318,11 @@ Automatic fact gathering runs at the start of a play unless disabled. I can insp
     var: ansible_facts
 ```
 
-`inventory_hostname` comes from inventory. The hostname and FQDN facts come from the managed machine. They happen to be related in my lab, but they are not the same source.
+`inventory_hostname` comes from inventory. The hostname and FQDN facts come from the managed machine. They happen to be related in this lab, but they are not the same source.
 
 ## 9. Custom facts and set_fact
 
-On servera, I created `/etc/ansible/facts.d` with mode 0755, then wrote `custom.fact` with mode 0644:
+The servera setup created `/etc/ansible/facts.d` with mode 0755, then wrote `custom.fact` with mode 0644:
 
 ```ini
 [general]
@@ -332,7 +332,7 @@ state = started
 enabled = true
 ```
 
-My play used `gather_facts: false`. After creating the file, I explicitly ran setup so the new local facts were available in the same play:
+The play used `gather_facts: false`. Setup ran explicitly after the file was created, so the new local facts were available in the same play:
 
 ```yaml
 - name: Gather facts after creating the custom fact file
@@ -358,17 +358,17 @@ My play used `gather_facts: false`. After creating the file, I explicitly ran se
     enabled: "{{ custom['enabled'] }}"
 ```
 
-The lookup contains the file basename `custom` and the INI section `general`. The returned enabled value was the string `"true"`; the module accepted it for its boolean parameter in my environment.
+The lookup contains the file basename `custom` and the INI section `general`. The returned enabled value was the string `"true"`; the module accepted it for its boolean parameter in this environment.
 
-The `.fact` file persists on servera. My set_fact task creates a host variable during execution; it does not write that file or make the variable survive a later run by itself.
+The `.fact` file persists on servera. The set_fact task creates a host variable during execution; it does not write that file or make the variable survive a later run by itself.
 
 I initially wrote a literal word as the set_fact value instead of referencing the collected dictionary. I also used `custom['package']` as the service name. That managed cockpit instead of the requested cockpit.socket. Lint and a repeated run did not catch that mismatch with my intended service. I corrected it to `custom['service']`.
 
 ## 10. Magic variables and another host's facts
 
-I used these expressions in `facts-inventory.yml`:
+Expressions used in `facts-inventory.yml`:
 
-| Expression | Meaning in my exercise |
+| Expression | Meaning in this exercise |
 | --- | --- |
 | inventory_hostname | The current inventory host |
 | group_names | Groups containing the current host |
@@ -376,13 +376,13 @@ I used these expressions in `facts-inventory.yml`:
 | hostvars['serverb']['ansible_facts']['default_ipv4']['address'] | Serverb's gathered default IPv4 address |
 | playbook_dir | The playbook directory on the controller side |
 
-**Observed:** Servera and serverb showed allservers and prod. Serverc and serverd showed allservers and dev. Every host displayed serverb's IP as 172.16.218.11 when I used hostvars.
+**Observed:** Servera and serverb showed allservers and prod. Serverc and serverd showed allservers and dev. Every host displayed serverb's IP as 172.16.218.11 through hostvars.
 
-My play gathered facts for allservers before running the debug task. Looking up another host in hostvars does not gather its facts automatically. Those facts must already be available from gathering or an appropriate fact cache.
+The play gathered facts for allservers before running the debug task. Looking up another host in hostvars does not gather its facts automatically. Those facts must already be available from gathering or an appropriate fact cache.
 
 ## 11. Exporting facts to JSON
 
-My corrected `facts-export.yml`:
+The corrected `facts-export.yml`:
 
 ```yaml
 ---
@@ -413,7 +413,7 @@ My corrected `facts-export.yml`:
 
 I first tried debug for directory creation. Debug only displays information; the file module creates the directory.
 
-Setup runs on each managed server. The two delegated tasks run on localhost. With my execution environment enabled, that means the execution environment's local context. I used the mounted project path so I could keep the output in my project.
+Setup runs on each managed server. The two delegated tasks run on localhost. With the execution environment enabled, that means the execution environment's local context. The mounted project path keeps the output available in the project.
 
 The per-host directory uses the original `inventory_hostname`, so each host gets its own facts.json. `to_nice_json` formats the dictionary as readable JSON.
 
@@ -421,9 +421,9 @@ The per-host directory uses the original `inventory_hostname`, so each host gets
 
 Hardware is not a synonym for only minimum facts. This subset selection also retains the minimum facts. Some collected values can change between runs, so a later JSON snapshot can legitimately change too.
 
-## 12. My first Vault exercise
+## 12. First Vault exercise
 
-I used an encrypted `vars/vault.yml` containing app_user and app_password. My play loaded it with vars_files and wrote `/etc/rhce-vault.conf` on prod:
+The encrypted `vars/vault.yml` contained app_user and app_password. The play loaded it with vars_files and wrote `/etc/rhce-vault.conf` on prod:
 
 ```yaml
 - name: Write the application configuration
@@ -438,7 +438,7 @@ I used an encrypted `vars/vault.yml` containing app_user and app_password. My pl
   no_log: true
 ```
 
-I initially misspelled the output field password. A successful task can still write the wrong text when I make a mistake in content.
+I initially misspelled the output field password. A successful task can still write the wrong text because of a typo in content.
 
 ```bash
 ansible-navigator run vault-practice.yml -i inventory-bab3 -m stdout --pae false --ask-vault-pass
@@ -446,7 +446,7 @@ ansible-navigator run vault-practice.yml -i inventory-bab3 -m stdout --pae false
 
 **Observed:** The first successful run changed one task on each prod host. The second reported `changed=0` on both.
 
-I need to keep three things seperate:
+Three seperate things to keep in mind:
 
 | Item | Purpose |
 | --- | --- |
@@ -460,7 +460,7 @@ Vault encryption protects the source data at rest. The generated configuration o
 
 ## 13. Vault commands and password files
 
-These are the commands I want available as a reference. The authentication options depend on which Vault sources I have configured for that exercise.
+Vault command reference. The authentication options depend on which Vault sources are configured for the exercise.
 
 | Command | Purpose |
 | --- | --- |
@@ -471,9 +471,9 @@ These are the commands I want available as a reference. The authentication optio
 | ansible-vault decrypt vars/secret.yml | Leave the file decrypted on disk |
 | ansible-vault rekey vars/vault.yml | Change the encryption password for an encrypted file |
 
-Decrypting needs the password that encrypted the data. Rekeying does not change the application values inside the file. For an individually encrypted variable, I generate a replacement encrypted value instead of using file rekey on the surrounding mixed YAML file.
+Decrypting needs the password that encrypted the data. Rekeying does not change the application values inside the file. For an individually encrypted variable, generate a replacement encrypted value instead of using file rekey on the surrounding mixed YAML file.
 
-I first practised automatic password loading with a `.vault-pass` file and `vault_password_file` in ansible.cfg. Later, the final review used a named identity and a different password file.
+The earlier password-loading exercise used a `.vault-pass` file and `vault_password_file` in ansible.cfg. The final review used a named identity and a different password file.
 
 **Final review configuration**, under the existing defaults section:
 
@@ -488,24 +488,24 @@ The `.web_pass` file contains the Vault password on one line. It is a plaintext 
 chmod 600 .web_pass
 ```
 
-I created `.gitignore` in my project folder and added the password file names:
+The project's `.gitignore` included these password file names:
 
 ```gitignore
 .web_pass
 .vault-pass
 ```
 
-This keeps new, untracked password files out of Git. It does not remove a file that has already been committed. I do not store the actual password files or their contents in this notes repository.
+This keeps new, untracked password files out of Git. It does not remove a file that has already been committed. Actual password files and their contents are not stored in this notes repository.
 
-## 14. Vault IDs and the CLI mistakes I made
+## 14. Vault IDs and CLI mistakes
 
-For prod and dev, I used separate encrypted variable files and two plays. Both files used the same variable names, app_user and app_password, but each play loaded the file for its environment.
+The prod and dev exercise used separate encrypted variable files and two plays. Both files used the same variable names, app_user and app_password, but each play loaded the file for its environment.
 
 ```bash
 ansible-navigator run vault-environments.yml -i inventory-bab3 -m stdout --pae false --vault-id prod@prompt --vault-id dev@prompt
 ```
 
-**Observed:** I got a prompt for each identity. The headers ended in prod and dev, and the second run reported no changes on all four hosts.
+**Observed:** The command prompted for each identity. The headers ended in prod and dev, and the second run reported no changes on all four hosts.
 
 The syntax for a labelled password source is:
 
@@ -517,11 +517,11 @@ Examples are `prod@prompt` or `web-user@.web_pass`. The label is not the passwor
 
 I made two useful mistakes in the final review:
 
-| What I entered or saw | What happened |
+| Command or output | What happened |
 | --- | --- |
 | --vault-id web-user | Ansible looked for a password file named web-user and warned that it did not exist |
-| Encryption successful after that warning | Encryption still completed using an available password source; I needed to inspect the result rather than assume it failed |
-| --vault-id web-user@.web_pass with the same identity already in config | My environment reported two available entries: web-user,web-user |
+| Encryption successful after that warning | Encryption still completed using an available password source; the result needed checking before assuming it failed |
+| --vault-id web-user@.web_pass with the same identity already in config | The environment reported two available entries: web-user,web-user |
 | Command without the repeated CLI identity | The intended way to use the single identity already configured in ansible.cfg |
 
 With only the final review identity configured, the encryption command is simply:
@@ -530,11 +530,11 @@ With only the final review identity configured, the encryption command is simply
 ansible-vault encrypt vars/secret.yml
 ```
 
-This command is for a plaintext file. I should not encrypt it again just because I saw a warning in an earlier command.
+This command is for a plaintext file. A warning does not necessarily mean encryption failed, so check the file before trying again.
 
-The error for multiple identities mentioned `--encrypt-vault-id`. That option selects an encryption label when multiple password sources are intentionally available. For my single-identity setup, removing the duplicate CLI source was simpler.
+The error for multiple identities mentioned `--encrypt-vault-id`. That option selects an encryption label when multiple password sources are intentionally available. With only one identity needed here, removing the duplicate CLI source was simpler.
 
-I can inspect the header without displaying the secret values:
+We can inspect the header without displaying the secret values:
 
 ```bash
 head -1 vars/secret.yml
@@ -552,13 +552,13 @@ One earlier encrypted file had a valid header without a label:
 $ANSIBLE_VAULT;1.1;AES256
 ```
 
-It was still encrypted and usable with the correct password. I later rekeyed it to add lab as the label. Passing a labelled password source during a playbook run does not rewrite the file's header.
+It was still encrypted and usable with the correct password. Rekeying later added lab as the label. Passing a labelled password source during a playbook run does not rewrite the file's header.
 
 By default, labels help Ansible choose which supplied password to try first. A label is not an extra security boundary. The actual password must decrypt the data.
 
 ## 15. Encrypting one variable and copying an encrypted file
 
-I practised a mixed variable file: app_user stayed readable, while app_password used an encrypted value.
+The mixed variable file kept app_user readable while app_password used an encrypted value.
 
 **Reference command for an exercise using the lab identity, without conflicting default Vault sources:**
 
@@ -566,13 +566,13 @@ I practised a mixed variable file: app_user stayed readable, while app_password 
 ansible-vault encrypt_string --vault-id lab@prompt --stdin-name app_password
 ```
 
-After entering the Vault password, I supply the string to encrypt through standard input and finish with EOF. I avoid adding an unintended trailing newline to the secret. In my interactive terminal, Ctrl+D twice after the last character finished the input.
+After entering the Vault password, supply the string to encrypt through standard input and finish with EOF. Avoid adding an unintended trailing newline to the secret. In the terminal used for this exercise, Ctrl+D twice after the last character finished the input.
 
 I originally forgot the two hyphens before stdin-name. Ansible then encrypted the literal command arguments stdin-name and app_password and produced two unnamed blocks. I discarded those and reran the corrected command.
 
-The resulting block belongs under `app_password: !vault |`. I keep its indentation and copy the whole encrypted block. I do not copy a prompt or success message into the YAML file.
+The resulting block belongs under `app_password: !vault |`. Copy the whole encrypted block with its indentation, leaving out the prompt and success message.
 
-My mixed exercise also copied a completely encrypted source file:
+The mixed exercise also copied a completely encrypted source file:
 
 ```yaml
 - name: Copy the encrypted application file
@@ -588,21 +588,21 @@ My mixed exercise also copied a completely encrypted source file:
 
 The normal controller-side copy action can decrypt the source when Ansible has the correct Vault password. The managed destination receives plaintext. `decrypt: true` is already the copy module's default; setting it explicitly makes the intention visible. `decrypt: false` would copy the encrypted bytes instead.
 
-**Observed:** My two-task `vault-mixed.yml` changed twice on the first successful run and reported `changed=0` on the next. After successfully rekeying the full source file with the lab label, the destination still needed no change because its plaintext content stayed the same.
+**Observed:** The two-task `vault-mixed.yml` changed twice on the first successful run and reported `changed=0` on the next. After successfully rekeying the full source file with the lab label, the destination still needed no change because its plaintext content stayed the same.
 
 ## 16. Final review: HTTPS with authentication
 
 The final exercise combined variables, facts, Vault and registered output. Serverb was the web server. Servera made the HTTPS request.
 
-The course environment normally provides starter files. For my homelab, I prepared `files/bab3-review/httpd.conf`, `.htaccess` and `htpasswd` from my existing Apache setup.
+The course environment normally provides starter files. For this homelab, `files/bab3-review/httpd.conf`, `.htaccess` and `htpasswd` were prepared using the existing Apache setup.
 
-Inside the `<Directory "/var/www/html">` block of the local httpd.conf copy, I allowed the authentication directives with:
+Inside the `<Directory "/var/www/html">` block of the local httpd.conf copy, this setting allowed the authentication directives:
 
 ```apache
 AllowOverride AuthConfig
 ```
 
-My `.htaccess` content was:
+The `.htaccess` content:
 
 ```apache
 AuthType Basic
@@ -613,9 +613,9 @@ Require valid-user
 
 The htpasswd file contained a hash for the guest HTTP login. Guest is a web authentication user here; this did not require creating a Linux account named guest.
 
-I stored the matching web_pass variable in `vars/secret.yml`, encrypted that file with the web-user identity, and used the `.web_pass` configuration shown earlier. The web login password and the Vault password serve different purposes.
+The `vars/secret.yml` file contained web_pass and was encrypted with the web-user identity. The `.web_pass` configuration shown earlier supplied its Vault password. The web login password and the Vault password serve different purposes.
 
-My final `webserver-review.yml`, with task names cleaned up and the expected HTTP status written explicitly:
+The final `webserver-review.yml`, with task names cleaned up and the expected HTTP status written explicitly:
 
 ```yaml
 ---
@@ -729,15 +729,15 @@ My final `webserver-review.yml`, with task names cleaned up and the expected HTT
 
 This playbook depends on the prepared local configuration and encrypted variable files. The notes do not include the actual htpasswd data or Vault password file.
 
-I used an IP in the URL because Ansible inventory aliases do not automatically become DNS names available to servera. The FQDN in the page comes from serverb's facts.
+The URL uses an IP because Ansible inventory aliases do not automatically become DNS names available to servera. The FQDN in the page comes from serverb's facts.
 
 The URI module accepts user and password as aliases for url_username and url_password. Its default successful status is already 200. The notes version includes status_code explicitly to make the test clearer. Certificate validation is disabled for this controlled lab's self-signed certificate.
 
 I first debugged the entire auth_test result. I changed it to auth_test.content so the task displays the page requested by the exercise. The no_log setting on the URI task does not carry over to another debug task.
 
-One remaining limitation is configuration reloads. `state: started` does not restart an already running Apache process when httpd.conf changes. When repeating this setup on the server left over from Chapter 2, I need to account for a one-time service restart after such changes. This playbook does not automate that transition with a handler. An unconditional restarted task would restart Apache on every run, so I kept the chapter's started behaviour.
+One remaining limitation is configuration reloads. `state: started` does not restart an already running Apache process when httpd.conf changes. On the server left over from Chapter 2, such changes need a one-time service restart. This playbook does not automate that transition with a handler. It keeps the chapter's started behaviour, avoiding an unconditional restart on every run.
 
-## 17. My final verification
+## 17. Final verification
 
 ```bash
 ansible-navigator run webserver-review.yml -i inventory-bab3 -m stdout --pae false
@@ -758,7 +758,7 @@ serverb : ok=10 changed=0 unreachable=0 failed=0 skipped=0
 
 There were nine setup tasks plus fact gathering on serverb. Servera had fact gathering, the URI request and the debug task. The URI request passed its expected HTTP 200 check and returned the correct serverb content.
 
-I also tested the same URL from servera without sending login credentials:
+The same URL was also tested from servera without sending login credentials:
 
 ```bash
 ssh student@172.16.218.10 'curl -ks -o /dev/null -w "%{http_code}\n" https://172.16.218.11/'
@@ -781,21 +781,21 @@ My first attempt had a missing quote, then I typed `%http_code}` without the ope
 
 The 401 check matters because getting a page with credentials alone would not prove that the server rejects requests without credentials.
 
-## 18. What I want to remember from section 3.8
+## 18. Summary from section 3.8
 
-1. Variables store values that my tasks reuse. I need to know which source supplies the winning value.
+1. Variables store values that tasks reuse. Check which source supplies the winning value.
 2. Dictionary keys and list positions are different ways of selecting data.
-3. Register saves a task result. I should inspect the returned fields instead of assuming every result has content.
+3. Register saves a task result. Inspect the returned fields instead of assuming every result has content.
 4. Facts describe managed hosts. Custom fact files add data that setup can collect.
 5. Magic variables describe inventory and execution context. Hostvars can expose another host's facts when those facts are available.
 6. Vault protects sensitive source data at rest. Its password, its label and the application password are different things.
-7. A clean recap is useful, but I still verify the content and behaviour the exercise asked for.
+7. Check the requested content and behaviour as well as the play recap.
 
 I finished the adapted chapter, but I do not yet remeber every option without checking. My next revision should be one combined exercise from a blank playbook, then I can compare it with these notes.
 
-My reading references:
+Reading references:
 
-1. AU294 AAP 2.5, Chapter 3, including the final review and summary. These notes record the exercises, corrections and results from my homelab.
+1. AU294 AAP 2.5, Chapter 3, including the final review and summary. These notes record the exercises, corrections and results from the homelab.
 2. [Ansible variables](https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_variables.html).
 3. [Facts and magic variables](https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_vars_facts.html).
 4. [Encrypting content with Ansible Vault](https://docs.ansible.com/projects/ansible/latest/vault_guide/vault_encrypting_content.html).

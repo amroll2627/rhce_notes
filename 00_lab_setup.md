@@ -1,4 +1,4 @@
-# My RHCE Home Lab Setup
+# RHCE Home Lab Setup
 
 [Back to index](README.md)
 
@@ -6,11 +6,11 @@
 
 I built this lab to practise Ansible on several servers.
 
-I also saved baseline snapshots so I can return to a working setup without reinstalling everything.
+Baseline snapshots provide a way back to a working setup without reinstalling everything.
 
 ## 2. Platform and storage
 
-I use VMware Fusion on a Mac mini with Apple silicon M4.
+The lab uses VMware Fusion on a Mac mini with Apple silicon M4.
 
 The virtual machines use RHEL 10.0 for ARM. The installer is:
 
@@ -18,7 +18,7 @@ The virtual machines use RHEL 10.0 for ARM. The installer is:
 rhel-10.0-aarch64-dvd.iso
 ```
 
-My external SSD is about 500 GB. I use the Data volume for the lab.
+The lab uses the Data volume on an external SSD of about 500 GB.
 
 The Data volume is 270 GB and had about 198 GiB free before the lab setup. The free space will be different after creating VMs and snapshots.
 
@@ -26,7 +26,7 @@ The other SSD volumes contain backups and work files.
 
 ## 3. Virtual machines
 
-My lab has these machines:
+The lab has these machines:
 
 1. workstation.lab.example.com: 172.16.218.9
 2. servera.lab.example.com: 172.16.218.10
@@ -49,7 +49,7 @@ ip -br a
 
 The VMs use Fusion's Share with my Mac network.
 
-My network settings are:
+Network settings:
 
 1. Network: 172.16.218.0/24
 2. Gateway: 172.16.218.2
@@ -57,9 +57,9 @@ My network settings are:
 4. Interface: ens160
 5. DHCP range: 172.16.218.128 to 172.16.218.254
 
-I use static addresses outside the DHCP range.
+The static addresses sit outside the DHCP range.
 
-I added these entries to /etc/hosts on the lab VMs, keeping the existing entries:
+These entries were added to /etc/hosts on the lab VMs, keeping the existing entries:
 
 ```text
 172.16.218.9  workstation.lab.example.com workstation
@@ -69,15 +69,15 @@ I added these entries to /etc/hosts on the lab VMs, keeping the existing entries
 172.16.218.13 serverd.lab.example.com serverd
 ```
 
-These addresses belong to my lab. Another Fusion installation may use a different subnet.
+These addresses belong to this homelab. Another Fusion installation may use a different subnet.
 
 ## 5. SSH and sudo
 
-I use the student account to connect to the managed servers.
+SSH connections to the managed servers use the student account.
 
-I created an SSH key on workstation and copied the public key to each managed server.
+An SSH key was created on workstation, and its public key was copied to each managed server.
 
-The managed servers also allow student to use sudo without a password. I edited the lab sudoers file using:
+The managed servers allow student to use sudo without a password. The lab sudoers file was edited using:
 
 ```bash
 sudo visudo -f /etc/sudoers.d/90-student-lab
@@ -89,7 +89,7 @@ The file contains:
 student ALL=(ALL) NOPASSWD: ALL
 ```
 
-This gives student full sudo access in my lab.
+This gives student full sudo access on the lab VMs.
 
 To verify access:
 
@@ -106,7 +106,7 @@ Each server returned its hostname and root.
 
 ## 6. Development environment
 
-VS Code runs on workstation. I use the Ansible extension and the Dev Containers extension.
+VS Code runs on workstation with the Ansible and Dev Containers extensions.
 
 The project folder on workstation is:
 
@@ -120,7 +120,7 @@ Inside the development container, the project is available at:
 /workspaces/rhce-lab
 ```
 
-I use Podman as the container engine.
+Podman is the container engine.
 
 The development container image is:
 
@@ -134,13 +134,13 @@ The execution environment image is:
 registry.redhat.io/ansible-automation-platform-25/ee-supported-rhel8:latest
 ```
 
-The images use RHEL 8 as their base. My VMs run RHEL 10. These are different parts of the setup.
+The images use RHEL 8 as their base. The VMs run RHEL 10. These are different parts of the setup.
 
-The Podman image store inside my development container was empty at first. Pulling an image on workstation did not make it appear in that container's image store.
+The Podman image store inside the development container was empty at first. Pulling an image on workstation did not make it appear in that container's image store.
 
 ## 7. SSH agent
 
-Before opening VS Code, I run these commands as student in a workstation desktop terminal:
+Before opening VS Code, run these commands as student in a workstation desktop terminal:
 
 ```bash
 eval "$(ssh-agent -s)"
@@ -148,9 +148,9 @@ ssh-add ~/.ssh/id_ed25519
 code ~/rhce-lab
 ```
 
-Then I use Dev Containers: Reopen in Container.
+Then select Dev Containers: Reopen in Container.
 
-Inside the development container, I can check the available key with:
+Inside the development container, check the available key with:
 
 ```bash
 ssh-add -l
@@ -165,9 +165,9 @@ The project uses four main files:
 3. ansible-navigator.yml: Navigator and execution environment settings.
 4. check-lab.yml: a basic connectivity test.
 
-The configuration files are explained in my Chapter 1 notes.
+The configuration files are explained in the Chapter 1 notes.
 
-My inventory contains:
+Inventory contents:
 
 ```ini
 [lab]
@@ -188,7 +188,7 @@ ZoneInfoNotFoundError: 'No time zone found with key UTC'
 
 The tzdata RPM was installed, but /usr/share/zoneinfo/UTC was missing.
 
-Installing the Python tzdata package alone did not fix my Navigator run.
+Installing the Python tzdata package alone did not fix the Navigator run.
 
 This worked inside the development container:
 
@@ -209,7 +209,7 @@ This is one property, not a complete JSON file. The surrounding commas must be c
 
 ## 10. Verify the lab
 
-My check-lab.yml contains:
+The check-lab.yml file contains:
 
 ```yaml
 ---
@@ -221,7 +221,7 @@ My check-lab.yml contains:
       ansible.builtin.ping:
 ```
 
-I run it inside the development container from the project directory:
+Run it inside the development container from the project directory:
 
 ```bash
 ansible-navigator run check-lab.yml
@@ -237,7 +237,7 @@ The test was succesful.
 
 The Ansible ping module checks connectivity and Python execution. It is not an ICMP network ping.
 
-Because my configuration enables become, this test also checks execution through sudo.
+Because the configuration enables become, this test also checks execution through sudo.
 
 There were deprecation warnings, but they did not fail this test.
 
@@ -245,7 +245,7 @@ There were deprecation warnings, but they did not fail this test.
 
 After the connectivity test passed, I saved snapshots of workstation and all four managed servers.
 
-Before restoring a snapshot, I need to save any newer notes or playbooks that I want to keep.
+Before restoring a snapshot, save any newer notes or playbooks that need to be kept.
 
 For another study session:
 
@@ -256,4 +256,4 @@ For another study session:
 5. Run the connectivity test if needed.
 6. Start the exercise.
 
-This is my own lab. The official classroom has additional services and scripts. Commands such as lab start and lab grade are not included in a normal RHEL installation.
+This is a homelab. The official classroom has additional services and scripts. Commands such as lab start and lab grade are not included in a normal RHEL installation.

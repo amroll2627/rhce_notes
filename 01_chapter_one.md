@@ -6,21 +6,21 @@
 
 Doing the same task manually on many servers takes time. It is also easy to miss a step or configure one server differently.
 
-With Ansible, I can describe the work in a file and run it against several servers.
+With Ansible, we can describe the work in a file and run it against several servers.
 
 Examples include installing packages, creating users, updating configuration files and starting services.
 
-I can keep these files in Git so I can review changes and use them again.
+Keeping these files in Git makes it easier to review changes and reuse them.
 
 ## 2. How Ansible works
 
-For my Linux lab, Ansible connects to the managed servers using SSH.
+In this Linux lab, Ansible connects to the managed servers using SSH.
 
 Most Linux modules also need Python on the managed servers.
 
-Ansible is agentless. I do not need a permanent Ansible agent running on each server. Working access and the correct permissions are still required.
+Ansible is agentless. The managed servers do not need a permanent Ansible agent. Working access and the correct permissions are still required.
 
-Workstation hosts my automation tools. Servera through serverd are the managed nodes.
+Workstation hosts the automation tools. Servera through serverd are the managed nodes.
 
 ## 3. Important terms
 
@@ -56,15 +56,15 @@ The execution environment contains Ansible and the dependencies used to run the 
 
 An image is the packaged software used to create a container. Podman is the engine that manages containers.
 
-In my setup:
+The lab workflow:
 
-1. I work in VS Code inside the development container.
-2. I run Ansible Navigator.
+1. Open the project in VS Code inside the development container.
+2. Run Ansible Navigator.
 3. Navigator uses Podman to start the execution environment.
 4. Ansible connects to the managed servers through SSH.
 5. Tasks use sudo when privilege escalation is enabled.
 
-## 6. My ansible.cfg
+## 6. ansible.cfg
 
 This file provides default settings for Ansible.
 
@@ -85,7 +85,7 @@ become_ask_pass = false
 
 What the settings mean:
 
-1. inventory selects my project inventory file.
+1. inventory selects the project inventory file.
 2. remote_user sets student as the default SSH user.
 3. ask_pass disables the SSH password prompt.
 4. become enables privilege escalation.
@@ -93,7 +93,7 @@ What the settings mean:
 6. become_user selects root as the target user.
 7. become_ask_pass disables the sudo password prompt.
 
-Disabling a password prompt does not configure SSH keys or grant sudo access. I configured those separately.
+Disabling a password prompt does not configure SSH keys or grant sudo access. Those need to be configured separately.
 
 Logging in as student and becoming root are two different steps.
 
@@ -119,9 +119,9 @@ ansible-config dump --only-changed
 
 The first command shows the configuration file path. The second shows settings that differ from the defaults.
 
-These checks describe the environment where I run them. An execution environment can have different files or software from the development container.
+These checks describe the environment where the commands run. An execution environment can have different files or software from the development container.
 
-## 8. My ansible-navigator.yml
+## 8. ansible-navigator.yml
 
 This file controls how Ansible Navigator runs.
 
@@ -186,7 +186,7 @@ The basic terms are:
 6. Pull: fetch and integrate remote changes.
 7. Branch: a line of development in the repository.
 
-For now, I can write and edit my notes through GitHub.
+Notes can be created and edited through GitHub.
 
 Later, inside a local clone, a normal update could look like this:
 
@@ -199,7 +199,7 @@ git push
 
 A local commit is not automatically uploaded. Push sends it to GitHub.
 
-## 11. What I need to practise
+## 11. Practice checklist
 
 1. Explain how Ansible connects to a managed server.
 2. Understand the difference between the development container and execution environment.
@@ -212,4 +212,4 @@ A local commit is not automatically uploaded. Push sends it to GitHub.
 
 I do not need to memorise my lab's long image address. I need to understand how to use the image and settings required by a task.
 
-These configuration files will appear again when I practise inventories, playbooks and later topics.
+These configuration files appear again in the later inventory and playbook exercises.
