@@ -13,6 +13,7 @@ I use ChatGPT to help explain topics, review my attempts and draft these notes. 
 3. [Chapter 2: Introduction to Developing Automation Content](02_chapter_two.md)
 4. [Chapter 3: Developing Automation Content: Variables](03_chapter_three.md)
 5. [Chapter 4: Developing Automation Content: Task Control](04_chapter_four.md)
+6. [Chapter 5: Developing Automation Content: Deploying Files](05_chapter_five.md)
 
 ## Lab
 
@@ -41,5 +42,7 @@ Chapter 2 home lab exercises are complete. The notes cover inventories, playbook
 Chapter 3 home lab exercises are complete. The notes cover variables, facts, magic variables and Ansible Vault. The final HTTPS review returned the correct page with authentication, rejected access without login, and completed a repeated run with no changes. I still need practice recalling the options without checking earlier examples.
 
 Chapter 4 home lab practice is complete for loops, conditions, handlers and error handling. The combined exercise recovered from a missing readiness file, then completed a repeated run with no changes. The notes include the mistakes with boolean comparisons and registered loop results. I still need to revisit this chapter and practise writing the combined playbook with less help.
+
+Chapter 5 home lab practice is complete for file management and Jinja2 templates. The combined exercise produced the required configuration using variables, facts, filters, a condition and a loop, then completed a repeated run with no changes. The notes include the conflicting copy/lineinfile tasks, the vars warning and output corrections. The official guided exercises and chapter lab were not run during this session.
 
 These are personal learning notes, not official Red Hat documentation.
