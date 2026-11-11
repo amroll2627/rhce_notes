@@ -43,6 +43,6 @@ Chapter 3 home lab exercises are complete. The notes cover variables, facts, mag
 
 Chapter 4 home lab practice is complete for loops, conditions, handlers and error handling. The combined exercise recovered from a missing readiness file, then completed a repeated run with no changes. The notes include the mistakes with boolean comparisons and registered loop results. I still need to revisit this chapter and practise writing the combined playbook with less help.
 
-Chapter 5 home lab practice is complete for file management and Jinja2 templates. The combined exercise produced the required configuration using variables, facts, filters, a condition and a loop, then completed a repeated run with no changes. The notes include the conflicting copy/lineinfile tasks, the vars warning and output corrections. The official guided exercises and chapter lab were not run during this session.
+Chapter 5 home lab practice is complete for file management and Jinja2 templates. The combined exercise produced the required configuration using variables, facts, filters, a condition and a loop, then completed a repeated run with no changes. The notes cover module selection, compatible file tasks, template syntax and verification. The official guided exercises and chapter lab were not run during this session.
 
 These are personal learning notes, not official Red Hat documentation.
